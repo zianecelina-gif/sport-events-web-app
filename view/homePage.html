@@ -1,0 +1,108 @@
+{% include 'header.html' %}
+
+<!-- ─── Hero Section ──────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>
+                    La plateforme des<br>
+                    relations sportives.<br>
+                    Trouvez des
+                    <span class="rotating-word text-gradient">
+                        <span>Partenaires</span>
+                        <span>Compétitions</span>
+                        <span>Passions</span>
+                        <span>Équipes</span>
+                        <span>Amitiés</span>
+                        <span>Aventures</span>
+                    </span>
+                </h1>
+                <p>
+                    Votre nouvelle communauté sportive vous attend. Sur Kalos, des milliers de sportifs 
+                    comme vous cherchent à créer des liens solides autour de leurs centres d'intérêt.
+                </p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('create_event_page') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Créer un événement
+                    </a>
+                    <a href="{{ url_for('list_events') }}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-compass"></i> Explorer
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='creat1.png') }}" alt="Sportifs" class="hero-carousel-img" style="opacity:1; transition: opacity 1s ease; position: absolute;">
+                <img src="{{ url_for('static', filename='creat2.png') }}" alt="Partenaires" class="hero-carousel-img" style="opacity:0; transition: opacity 1s ease; position: absolute;">
+                <img src="{{ url_for('static', filename='creat3.png') }}" alt="Communauté" class="hero-carousel-img" style="opacity:0; transition: opacity 1s ease;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Stats Bar ─────────────────────────────────────────────────── -->
+<section class="container">
+    <div class="stats-bar glass-card">
+        <div class="stat-item">
+            <div class="stat-number" data-target="{{ stats.users }}">0</div>
+            <div class="stat-label">Sportifs inscrits</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="{{ stats.events }}">0</div>
+            <div class="stat-label">Événements créés</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="{{ stats.participations }}">0</div>
+            <div class="stat-label">Participations</div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Features Section ──────────────────────────────────────────── -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2><span class="text-gradient">Kalos</span> facilite votre vie sportive</h2>
+            <p>Tout ce dont vous avez besoin pour trouver des partenaires et rejoindre des événements sportifs locaux.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card glass-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Partenaires sportifs</h3>
+                <p>Trouvez des sportifs enthousiastes près de chez vous. Football, tennis, natation — il y a toujours quelqu'un prêt à vous rejoindre.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">🏆</div>
+                <h3>Compétitions locales</h3>
+                <p>Repousser vos limites avec des partenaires aussi déterminés et ambitieux que vous. De la course au cyclisme.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">💪</div>
+                <h3>Amitiés durables</h3>
+                <p>Bâtissez des amitiés solides à travers le sport. La camaraderie est au cœur de chaque activité sur Kalos.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── CTA Section ───────────────────────────────────────────────── -->
+<section class="section" style="text-align: center;">
+    <div class="container">
+        <div class="section-header">
+            <h2>Prêt à rejoindre la communauté ?</h2>
+            <p>Découvrez les événements sportifs près de chez vous et inscrivez-vous en quelques clics.</p>
+        </div>
+        <div class="hero-actions" style="justify-content: center;">
+            <a href="{{ url_for('list_events') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search"></i> Parcourir les événements
+            </a>
+            {% if 'id' not in session %}
+            <a href="{{ url_for('signup') }}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-user-plus"></i> S'inscrire gratuitement
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% include 'footer.html' %}

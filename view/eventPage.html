@@ -1,0 +1,557 @@
+{% include 'header.html' %}
+
+<!-- ─── DataTables CSS ─────────────────────────────────────────────── -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+
+<!-- ─── DataTable Custom Styles ──────────────────────────────────── -->
+<style>
+    /* ── Wrapper ────────────────────────────────────────────────── */
+    .datatable-section {
+        margin-top: 32px;
+    }
+
+    .datatable-wrapper {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(12px);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* ── Top bar (search + length) ──────────────────────────────── */
+    div.dataTables_wrapper div.dataTables_filter,
+    div.dataTables_wrapper div.dataTables_length {
+        padding: 20px 24px 0 24px;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    div.dataTables_wrapper div.dataTables_filter label,
+    div.dataTables_wrapper div.dataTables_length label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input,
+    div.dataTables_wrapper div.dataTables_length select {
+        background: var(--bg-glass);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        padding: 8px 14px;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input:focus,
+    div.dataTables_wrapper div.dataTables_length select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input::placeholder {
+        color: var(--text-muted);
+    }
+
+    /* ── Table ──────────────────────────────────────────────────── */
+    table.dataTable {
+        width: 100% !important;
+        border-collapse: collapse;
+        margin: 16px 0 0 0 !important;
+    }
+
+    table.dataTable thead th {
+        background: rgba(59, 130, 246, 0.08);
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 1px solid var(--border-accent) !important;
+        border-top: none !important;
+        padding: 14px 20px;
+        white-space: nowrap;
+    }
+
+    table.dataTable thead th.sorting,
+    table.dataTable thead th.sorting_asc,
+    table.dataTable thead th.sorting_desc {
+        cursor: pointer;
+        transition: color var(--transition-fast);
+    }
+
+    table.dataTable thead th.sorting:hover {
+        color: var(--accent-light);
+    }
+
+    table.dataTable thead th.sorting_asc {
+        color: var(--accent-light);
+    }
+
+    table.dataTable thead th.sorting_desc {
+        color: var(--accent-light);
+    }
+
+    /* Custom sort arrows */
+    table.dataTable thead th.sorting::after,
+    table.dataTable thead th.sorting_asc::after,
+    table.dataTable thead th.sorting_desc::after {
+        color: var(--accent);
+        opacity: 0.8;
+    }
+
+    table.dataTable tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background var(--transition-fast);
+    }
+
+    table.dataTable tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    table.dataTable tbody tr:hover {
+        background: var(--bg-glass-hover) !important;
+        cursor: pointer;
+    }
+
+    table.dataTable tbody td {
+        padding: 16px 20px;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        border: none !important;
+        vertical-align: middle;
+    }
+
+    /* ── Bottom bar (info + pagination) ─────────────────────────── */
+    div.dataTables_wrapper div.dataTables_info {
+        padding: 16px 24px;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        padding: 12px 24px 20px 24px;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate .pagination {
+        justify-content: flex-end;
+        gap: 4px;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate .page-item .page-link {
+        background: var(--bg-glass);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        border-radius: var(--radius-sm) !important;
+        padding: 7px 14px;
+        font-size: 0.85rem;
+        transition: all var(--transition-fast);
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate .page-item .page-link:hover {
+        background: var(--bg-glass-hover);
+        border-color: var(--border-hover);
+        color: var(--text-primary);
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate .page-item.active .page-link {
+        background: var(--gradient-primary);
+        border-color: transparent;
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate .page-item.disabled .page-link {
+        background: transparent;
+        color: var(--text-muted);
+        border-color: var(--border);
+        opacity: 0.5;
+    }
+
+    /* ── Badge: activité ────────────────────────────────────────── */
+    .dt-activity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        color: var(--accent-light);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    /* ── Badge: places ──────────────────────────────────────────── */
+    .dt-headcount-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .dt-headcount-badge.full {
+        color: var(--error);
+    }
+
+    .dt-headcount-badge.available {
+        color: var(--success);
+    }
+
+    /* ── Event name link ────────────────────────────────────────── */
+    .dt-event-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        transition: color var(--transition-fast);
+    }
+
+    .dt-event-name:hover {
+        color: var(--accent-light);
+    }
+
+    /* ── Location cell ──────────────────────────────────────────── */
+    .dt-location {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* ── Date cell ──────────────────────────────────────────────── */
+    .dt-date {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* ── No data ────────────────────────────────────────────────── */
+    table.dataTable tbody td.dataTables_empty {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 48px 20px;
+        font-size: 0.95rem;
+    }
+
+    /* ── View toggle buttons ────────────────────────────────────── */
+    .view-toggle {
+        display: flex;
+        gap: 8px;
+    }
+
+    .view-toggle-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg-glass);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        border-radius: var(--radius-sm);
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .view-toggle-btn:hover {
+        border-color: var(--border-hover);
+        color: var(--text-primary);
+    }
+
+    .view-toggle-btn.active {
+        background: var(--gradient-primary);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* ── Section header ─────────────────────────────────────────── */
+    .events-main-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+</style>
+
+<div class="events-page container">
+    <!-- ─── Sidebar Filter ──────────────────────────────────────── -->
+    <aside class="events-sidebar glass-card">
+        <h2 class="sidebar-title">
+            <i class="fas fa-filter"></i> Filtrer les événements
+        </h2>
+        
+        <form action="{{ url_for('filter_events') }}" method="get">
+            <div class="form-group">
+                <label for="activite" class="form-label">Activité sportive</label>
+                <select name="activite" id="activite" class="form-select">
+                    <option value="/">Toutes les activités</option>
+                    <option value="Football">Football</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Cricket">Cricket</option>
+                    <option value="Tennis">Tennis</option>
+                    <option value="Volleyball">Volleyball</option>
+                    <option value="Ping-pong">Ping-pong</option>
+                    <option value="Badminton">Badminton</option>
+                    <option value="Rugby">Rugby</option>
+                    <option value="Golf">Golf</option>
+                    <option value="Natation">Natation</option>
+                    <option value="Athlétisme">Athlétisme</option>
+                    <option value="Cyclisme">Cyclisme</option>
+                    <option value="Gymnastique">Gymnastique</option>
+                    <option value="Boxe">Boxe</option>
+                    <option value="MMA">MMA</option>
+                    <option value="Baseball">Baseball</option>
+                    <option value="Ski">Ski</option>
+                    <option value="Hockey sur glace">Hockey sur glace</option>
+                    <option value="Hockey sur gazon">Hockey sur gazon</option>
+                    <option value="Escalade">Escalade</option>
+                    <option value="Musculation">Musculation</option>
+                    <option value="Pétanque">Pétanque</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                Appliquer le filtre
+            </button>
+        </form>
+
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Vous ne trouvez pas votre bonheur ?</p>
+            <a href="{{ url_for('create_event_page') }}" class="btn btn-secondary btn-block btn-sm">
+                <i class="fas fa-plus"></i> Créer un événement
+            </a>
+        </div>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────────────────── -->
+    <main class="events-main">
+
+        <!-- Header with view toggle -->
+        <div class="events-main-header">
+            <h1>Événements à venir</h1>
+            {% if events %}
+            <div class="view-toggle">
+                <button class="view-toggle-btn active" id="btn-cards" onclick="switchView('cards')">
+                    <i class="fas fa-th-large"></i> Cartes
+                </button>
+                <button class="view-toggle-btn" id="btn-table" onclick="switchView('table')">
+                    <i class="fas fa-table"></i> Tableau
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if events %}
+
+            <!-- ── CARD VIEW (default) ──────────────────────────── -->
+            <div id="view-cards" class="events-grid">
+                {% for event in events %}
+                <a href="{{ url_for('event_details', event_id=event.id) }}" class="event-card glass-card">
+                    <div class="event-card-image">
+                        <img src="{{ url_for('static', filename='activities/' + event.activity + '.jpg') }}" alt="{{ event.activity }}">
+                        <span class="event-activity-badge">{{ event.activity }}</span>
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">{{ event.name }}</h3>
+                        <div class="event-card-location">
+                            <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                        </div>
+                        <div class="event-card-meta">
+                            <span>
+                                <i class="far fa-calendar-alt"></i> 
+                                {{ event.date[8:10] }}/{{ event.date[5:7] }}/{{ event.date[0:4] }}
+                            </span>
+                            {% set is_full = event.current_count >= event.headcount %}
+                            <span style="color: {{ 'var(--error)' if is_full else 'var(--success)' }}; font-weight: 600;">
+                                <i class="fas fa-users"></i> {{ event.current_count }}/{{ event.headcount }}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- ── TABLE VIEW (DataTable) ───────────────────────── -->
+            <div id="view-table" class="datatable-section" style="display: none;">
+                <div class="datatable-wrapper">
+                    <table id="events-datatable" class="dataTable" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Événement</th>
+                                <th>Activité</th>
+                                <th>Date</th>
+                                <th>Lieu</th>
+                                <th>Places</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            {% set is_full = event.current_count >= event.headcount %}
+                            <tr 
+                                data-href="{{ url_for('event_details', event_id=event.id) }}"
+                                data-date="{{ event.date }}"
+                            >
+                                <!-- Nom -->
+                                <td>
+                                    <span class="dt-event-name">{{ event.name }}</span>
+                                </td>
+
+                                <!-- Activité -->
+                                <td>
+                                    <span class="dt-activity-badge">
+                                        <i class="fas fa-running"></i>
+                                        {{ event.activity }}
+                                    </span>
+                                </td>
+
+                                <!-- Date (affichage DD/MM/YYYY, tri sur YYYY-MM-DD via data-order) -->
+                                <td data-order="{{ event.date }}">
+                                    <span class="dt-date">
+                                        <i class="far fa-calendar-alt" style="color: var(--accent); margin-right: 6px;"></i>
+                                        {{ event.date[8:10] }}/{{ event.date[5:7] }}/{{ event.date[0:4] }}
+                                    </span>
+                                </td>
+
+                                <!-- Lieu -->
+                                <td>
+                                    <span class="dt-location" title="{{ event.location }}">
+                                        <i class="fas fa-map-marker-alt" style="color: var(--accent); margin-right: 6px;"></i>
+                                        {{ event.location }}
+                                    </span>
+                                </td>
+
+                                <!-- Places -->
+                                <td data-order="{{ event.current_count }}">
+                                    <span class="dt-headcount-badge {{ 'full' if is_full else 'available' }}">
+                                        <i class="fas fa-users"></i>
+                                        {{ event.current_count }}/{{ event.headcount }}
+                                        {% if is_full %}
+                                            <span style="font-size:0.75rem; opacity:0.8;">(Complet)</span>
+                                        {% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="empty-state glass-card">
+                <i class="fas fa-calendar-times"></i>
+                <h3>Aucun événement trouvé</h3>
+                <p>Il n'y a pas d'événements prévus pour cette activité en ce moment.</p>
+                <a href="{{ url_for('create_event_page') }}" class="btn btn-primary">Créer le premier</a>
+            </div>
+        {% endif %}
+
+    </main>
+</div>
+
+<!-- ─── DataTables JS ──────────────────────────────────────────────── -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   KALOS — Events DataTable
+   ═══════════════════════════════════════════════════════════════════ */
+
+let dataTable = null;
+
+/* ── Initialize DataTable ───────────────────────────────────────── */
+function initDataTable() {
+    if (dataTable) return; // Already initialized
+
+    dataTable = $('#events-datatable').DataTable({
+        // ── Language (French) ──────────────────────────────────────
+        language: {
+            search:          '<i class="fas fa-search" style="margin-right:8px; color:var(--accent);"></i>Rechercher :',
+            searchPlaceholder: 'Nom, activité, lieu…',
+            lengthMenu:      'Afficher _MENU_ événements',
+            info:            '_START_ à _END_ sur _TOTAL_ événements',
+            infoEmpty:       'Aucun événement disponible',
+            infoFiltered:    '(filtré depuis _MAX_ événements)',
+            zeroRecords:     'Aucun événement ne correspond à votre recherche.',
+            emptyTable:      'Aucun événement disponible.',
+            paginate: {
+                first:    '<i class="fas fa-angle-double-left"></i>',
+                last:     '<i class="fas fa-angle-double-right"></i>',
+                next:     '<i class="fas fa-angle-right"></i>',
+                previous: '<i class="fas fa-angle-left"></i>'
+            }
+        },
+
+        // ── Options ────────────────────────────────────────────────
+        pageLength:    10,
+        lengthMenu:    [5, 10, 25, 50],
+        order:         [[2, 'asc']], // Sort by date ASC by default
+        responsive:    true,
+        autoWidth:     false,
+
+        // ── Column definitions ─────────────────────────────────────
+        columnDefs: [
+            { targets: 0, width: '28%' },  // Nom
+            { targets: 1, width: '16%' },  // Activité
+            { targets: 2, width: '14%' },  // Date
+            { targets: 3, width: '30%' },  // Lieu
+            { targets: 4, width: '12%', searchable: false }  // Places
+        ],
+
+        // ── DOM layout ─────────────────────────────────────────────
+        dom:
+            '<"d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 pt-4"lf>' +
+            't' +
+            '<"d-flex justify-content-between align-items-center flex-wrap px-4 pb-2"ip>',
+
+        // ── Row click → navigate to event detail ──────────────────
+        createdRow: function(row) {
+            $(row).on('click', function() {
+                const href = $(this).data('href');
+                if (href) window.location.href = href;
+            });
+        }
+    });
+}
+
+/* ── View switcher ──────────────────────────────────────────────── */
+function switchView(view) {
+    const cardsEl  = document.getElementById('view-cards');
+    const tableEl  = document.getElementById('view-table');
+    const btnCards = document.getElementById('btn-cards');
+    const btnTable = document.getElementById('btn-table');
+
+    if (!cardsEl || !tableEl) return;
+
+    if (view === 'table') {
+        cardsEl.style.display = 'none';
+        tableEl.style.display = 'block';
+        btnCards.classList.remove('active');
+        btnTable.classList.add('active');
+        initDataTable(); // Lazy init on first open
+    } else {
+        tableEl.style.display = 'none';
+        cardsEl.style.display = 'grid';
+        btnCards.classList.add('active');
+        btnTable.classList.remove('active');
+    }
+}
+</script>
+
+{% include 'footer.html' %}

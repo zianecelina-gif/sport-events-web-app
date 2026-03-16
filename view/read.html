@@ -1,0 +1,109 @@
+{% include 'header.html' %}
+
+<div class="event-detail container">
+    <!-- ─── Hero Cover ──────────────────────────────────────────── -->
+    <div class="event-detail-hero">
+        <img src="{{ url_for('static', filename='activities/' + event.activity + '.jpg') }}" alt="{{ event.activity }}">
+        <div class="event-detail-hero-overlay">
+            <span class="activity-tag">
+                <i class="fas fa-running"></i> {{ event.activity }}
+            </span>
+            <h1>{{ event.name }}</h1>
+        </div>
+    </div>
+
+    <!-- ─── Two Column Layout ───────────────────────────────────── -->
+    <div class="event-detail-grid">
+        <!-- Main Info -->
+        <main>
+            <div class="event-info-card glass-card">
+                <div class="event-info-section">
+                    <h3>Description</h3>
+                    <p style="white-space: pre-wrap;">{{ event.description }}</p>
+                </div>
+
+                <div class="event-meta-grid">
+                    <div class="event-meta-item">
+                        <div class="label"><i class="far fa-calendar-alt"></i> Date</div>
+                        <div class="value">{{ event.date[8:10] }}/{{ event.date[5:7] }}/{{ event.date[0:4] }}</div>
+                    </div>
+                    <div class="event-meta-item">
+                        <div class="label"><i class="fas fa-map-marker-alt"></i> Lieu</div>
+                        <div class="value" style="font-size: 0.95rem;">{{ event.location }}</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar Actions & Members -->
+        <aside>
+            <div class="event-sidebar-card glass-card">
+                <!-- Action Buttons -->
+                {% if user_is_owner %}
+                    <form action="{{ url_for('delete_event', event_id=event.id) }}" method="post">
+                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
+                            <i class="fas fa-trash-alt"></i> Supprimer l'événement
+                        </button>
+                    </form>
+                {% else %}
+                    {% if user_is_registered %}
+                        <form action="{{ url_for('unregister', event_id=event.id) }}" method="post">
+                            <button type="submit" class="btn btn-secondary btn-block">
+                                <i class="fas fa-times-circle"></i> Annuler la participation
+                            </button>
+                        </form>
+                    {% else %}
+                        {% set is_full = current_headcount >= event.headcount %}
+                        <form action="{{ url_for('participate', event_id=event.id) }}" method="post">
+                            <button type="submit" class="btn btn-primary btn-block" {{ 'disabled' if is_full else '' }} style="{{ 'opacity: 0.5; cursor: not-allowed;' if is_full else '' }}">
+                                {% if is_full %}
+                                    <i class="fas fa-ban"></i> Complet
+                                {% else %}
+                                    <i class="fas fa-user-plus"></i> Rejoindre ({{ event.headcount - current_headcount }} places)
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+
+                <hr style="border: 0; height: 1px; background: var(--border); margin: 24px 0;">
+
+                <!-- Headcount & Progress -->
+                <div style="margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">
+                        <span>Participants</span>
+                        <span style="color: var(--accent-light);">{{ current_headcount }} / {{ event.headcount }}</span>
+                    </div>
+                    {% set fill_percent = (current_headcount / event.headcount) * 100 %}
+                    <div class="headcount-bar {{ 'almost-full' if fill_percent >= 80 else '' }}">
+                        <div class="headcount-fill" style="width: {{ fill_percent }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Members List -->
+                <div class="members-list">
+                    {% for member in members %}
+                    <div class="member-item">
+                        <div class="member-avatar">
+                            {{ member.first_name[0] | upper }}
+                        </div>
+                        <div class="member-info">
+                            <div class="member-name">{{ member.first_name }} {{ member.family_name }}</div>
+                            <div class="member-meta">
+                                {{ 'Homme' if member.gender == 'homme' else 'Femme' }} • {{ member.age }} ans
+                            </div>
+                        </div>
+                        {% if member.id == event.owner_id %}
+                        <div style="margin-left: auto; color: var(--warning); font-size: 0.8rem;" title="Organisateur">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+{% include 'footer.html' %}

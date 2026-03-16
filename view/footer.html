@@ -1,0 +1,21 @@
+<!-- ─── Footer ────────────────────────────────────────────────────── -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="{{ url_for('static', filename='Fichier1.svg') }}" alt="Kalos">
+                <span>Kalos</span>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('home') }}">Accueil</a>
+                <a href="{{ url_for('list_events') }}">Événements</a>
+            </div>
+            <p class="footer-text">© 2026 Kalos — Réseau Social Sportif. ZIANE celina  & AMROUN Said.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- ─── Scripts ───────────────────────────────────────────────────── -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

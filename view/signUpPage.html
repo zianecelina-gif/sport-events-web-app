@@ -1,0 +1,76 @@
+{% include 'header.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+
+<div class="auth-page">
+    <div class="auth-card signup-card glass-card">
+        <div class="auth-logo">
+            <img src="{{ url_for('static', filename='Fichier1.svg') }}" alt="Kalos">
+            <span>Kalos</span>
+        </div>
+        <h1>Rejoignez Kalos</h1>
+        <p class="subtitle">Créez votre compte et rejoignez la communauté sportive</p>
+
+        <form action="{{ url_for('do_signup') }}" method="post">
+            <div class="signup-grid">
+                <div class="form-group full-width">
+                    <label class="form-label" for="username">Nom d'utilisateur unique <span style="color: var(--error);">*</span></label>
+                    <input class="form-input" type="text" id="username" name="username" placeholder="Choisissez un nom d'utilisateur" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="firstName">Prénom <span style="color: var(--error);">*</span></label>
+                    <input class="form-input" type="text" id="firstName" name="firstName" placeholder="Votre prénom" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="familyName">Nom <span style="color: var(--error);">*</span></label>
+                    <input class="form-input" type="text" id="familyName" name="familyName" placeholder="Votre nom" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Mot de passe <span style="color: var(--error);">*</span></label>
+                    <input class="form-input" type="password" id="password" name="password" placeholder="Créez un mot de passe" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmationPassword">Confirmation <span style="color: var(--error);">*</span></label>
+                    <input class="form-input" type="password" id="confirmationPassword" name="confirmationPassword" placeholder="Confirmez votre mot de passe" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sexe <span style="color: var(--error);">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="gender" value="homme" required>
+                            <label for="male">👨 Homme</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="gender" value="femme" required>
+                            <label for="female">👩 Femme</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="age">Âge <span style="color: var(--error);">*</span></label>
+                    <input class="form-input" type="number" id="age" name="age" min="10" max="150" value="18" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label" for="bio">Bio</label>
+                    <textarea class="form-input form-textarea" id="bio" name="bio" placeholder="Parlez-nous de vous et de vos sports favoris..." rows="3"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 12px;">
+                <i class="fas fa-user-plus"></i> Créer mon compte
+            </button>
+        </form>
+
+        <p class="auth-link">
+            Déjà un compte ? <a href="{{ url_for('login') }}">Se connecter</a>
+        </p>
+    </div>
+</div>
+
+{% include 'footer.html' %}

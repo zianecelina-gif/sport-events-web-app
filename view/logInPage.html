@@ -1,0 +1,33 @@
+{% include 'header.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+
+<div class="auth-page">
+    <div class="auth-card glass-card">
+        <div class="auth-logo">
+            <img src="{{ url_for('static', filename='Fichier1.svg') }}" alt="Kalos">
+            <span>Kalos</span>
+        </div>
+        <h1>Bon retour !</h1>
+        <p class="subtitle">Connectez-vous pour retrouver votre communauté sportive</p>
+
+        <form action="{{ url_for('do_login') }}" method="post">
+            <div class="form-group">
+                <label class="form-label" for="username">Nom d'utilisateur</label>
+                <input class="form-input" type="text" id="username" name="username" placeholder="Votre nom d'utilisateur" required autofocus>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Mot de passe</label>
+                <input class="form-input" type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 8px;">
+                <i class="fas fa-sign-in-alt"></i> Connexion
+            </button>
+        </form>
+
+        <p class="auth-link">
+            Pas encore de compte ? <a href="{{ url_for('signup') }}">Créer un compte</a>
+        </p>
+    </div>
+</div>
+
+{% include 'footer.html' %}
