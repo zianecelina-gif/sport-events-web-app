@@ -1,0 +1,247 @@
+{% include 'header.html' %}
+
+<div class="profile-page container">
+    <div style="max-width: 680px; margin: 0 auto;">
+
+        <!-- ─── Page Title ───────────────────────────────────────── -->
+        <div style="margin-bottom: 32px;">
+            <a href="{{ url_for('show_profile', user_id=user.id) }}" 
+               style="display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px; transition: color var(--transition-fast);"
+               onmouseover="this.style.color='var(--accent-light)'" 
+               onmouseout="this.style.color='var(--text-secondary)'">
+                <i class="fas fa-arrow-left"></i> Retour au profil
+            </a>
+            <h1 style="font-size: 1.8rem; font-weight: 800;">Modifier mon profil</h1>
+            <p style="color: var(--text-secondary); margin-top: 6px;">Mettez à jour vos informations personnelles</p>
+        </div>
+
+        <!-- ─── Avatar Section ──────────────────────────────────── -->
+        <div class="glass-card" style="padding: 32px; margin-bottom: 24px;">
+            <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-camera" style="color: var(--accent);"></i> Photo de profil
+            </h2>
+
+            <!-- Current avatar preview -->
+            <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 28px;">
+                <div id="avatar-preview-wrapper" style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 2px solid var(--border-accent); box-shadow: 0 0 20px var(--accent-glow);">
+                    {% if user.avatar %}
+                        <img id="avatar-preview-img"
+                             src="{{ url_for('static', filename='avatars/' + user.avatar) }}"
+                             alt="Avatar"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div id="avatar-preview-initials"
+                             style="width: 100%; height: 100%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: white;">
+                            {{ user.first_name[0] | upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">{{ user.first_name }} {{ user.family_name }}</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">PNG, JPG, JPEG, GIF ou WEBP — max 5 Mo</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('edit_avatar') }}" method="post" enctype="multipart/form-data">
+                <!-- Hidden file input -->
+                <input type="file" id="avatar-file-input" name="avatar" accept="image/*" style="display: none;">
+
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button type="button" onclick="document.getElementById('avatar-file-input').click()" class="btn btn-secondary">
+                        <i class="fas fa-upload"></i> Choisir une image
+                    </button>
+                    <button type="submit" id="avatar-submit-btn" class="btn btn-primary" style="display: none;">
+                        <i class="fas fa-save"></i> Enregistrer la photo
+                    </button>
+                </div>
+
+                <!-- Selected file name -->
+                <p id="avatar-filename" style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); display: none;"></p>
+            </form>
+        </div>
+
+        <!-- ─── Bio Section ──────────────────────────────────────── -->
+        <div class="glass-card" style="padding: 32px; margin-bottom: 24px;">
+            <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-pen" style="color: var(--accent);"></i> Biographie
+            </h2>
+
+            <form action="{{ url_for('edit_bio') }}" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="bio">Parlez de vous en quelques mots</label>
+                    <textarea
+                        id="bio"
+                        name="bio"
+                        class="form-textarea"
+                        rows="4"
+                        maxlength="300"
+                        placeholder="Ex: Passionné de football et de natation, je cherche des partenaires pour des matchs hebdomadaires…"
+                    >{{ user.bio or '' }}</textarea>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+                        <span id="bio-counter" style="font-size: 0.8rem; color: var(--text-muted);">
+                            {{ (user.bio or '') | length }}/300
+                        </span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Enregistrer la bio
+                </button>
+            </form>
+        </div>
+
+        <!-- ─── Password Section ─────────────────────────────────── -->
+        <div class="glass-card" style="padding: 32px; margin-bottom: 48px;">
+            <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-lock" style="color: var(--accent);"></i> Mot de passe
+            </h2>
+
+            <form action="{{ url_for('edit_password') }}" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="current_password">Mot de passe actuel</label>
+                    <div style="position: relative;">
+                        <input type="password" id="current_password" name="current_password"
+                               class="form-input" placeholder="Votre mot de passe actuel" required>
+                        <button type="button" onclick="togglePassword('current_password', this)"
+                                style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="new_password">Nouveau mot de passe</label>
+                    <div style="position: relative;">
+                        <input type="password" id="new_password" name="new_password"
+                               class="form-input" placeholder="Au moins 6 caractères" required minlength="6">
+                        <button type="button" onclick="togglePassword('new_password', this)"
+                                style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Password strength bar -->
+                <div style="margin-top: -12px; margin-bottom: 20px;">
+                    <div style="height: 4px; background: var(--bg-glass); border-radius: 2px; overflow: hidden;">
+                        <div id="password-strength-bar" style="height: 100%; width: 0%; border-radius: 2px; transition: all 0.3s;"></div>
+                    </div>
+                    <p id="password-strength-label" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;"></p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Confirmer le nouveau mot de passe</label>
+                    <div style="position: relative;">
+                        <input type="password" id="confirm_password" name="confirm_password"
+                               class="form-input" placeholder="Répétez le nouveau mot de passe" required>
+                        <button type="button" onclick="togglePassword('confirm_password', this)"
+                                style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <p id="password-match-msg" style="font-size: 0.8rem; margin-top: 6px; display: none;"></p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-lock"></i> Changer le mot de passe
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ── Avatar preview ─────────────────────────────────────────────── */
+document.getElementById('avatar-file-input').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const filenameEl   = document.getElementById('avatar-filename');
+    const submitBtn    = document.getElementById('avatar-submit-btn');
+    const wrapper      = document.getElementById('avatar-preview-wrapper');
+
+    filenameEl.textContent = file.name;
+    filenameEl.style.display = 'block';
+    submitBtn.style.display = 'inline-flex';
+
+    // Live preview
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        wrapper.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width:100%;height:100%;object-fit:cover;">`;
+    };
+    reader.readAsDataURL(file);
+});
+
+/* ── Bio character counter ──────────────────────────────────────── */
+document.getElementById('bio').addEventListener('input', function () {
+    const counter = document.getElementById('bio-counter');
+    const len = this.value.length;
+    counter.textContent = `${len}/300`;
+    counter.style.color = len > 270 ? 'var(--warning)' : 'var(--text-muted)';
+});
+
+/* ── Password visibility toggle ────────────────────────────────── */
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon  = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+        btn.style.color = 'var(--accent)';
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+        btn.style.color = 'var(--text-muted)';
+    }
+}
+
+/* ── Password strength ──────────────────────────────────────────── */
+document.getElementById('new_password').addEventListener('input', function () {
+    const val = this.value;
+    const bar = document.getElementById('password-strength-bar');
+    const lbl = document.getElementById('password-strength-label');
+
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+        { pct: '20%', color: 'var(--error)',   label: 'Très faible' },
+        { pct: '40%', color: '#f97316',         label: 'Faible' },
+        { pct: '60%', color: 'var(--warning)',  label: 'Moyen' },
+        { pct: '80%', color: '#84cc16',         label: 'Fort' },
+        { pct: '100%',color: 'var(--success)',  label: 'Très fort' },
+    ];
+
+    if (val.length === 0) {
+        bar.style.width = '0%';
+        lbl.textContent = '';
+        return;
+    }
+
+    const lvl = levels[Math.min(score - 1, 4)];
+    bar.style.width      = lvl.pct;
+    bar.style.background = lvl.color;
+    lbl.textContent      = lvl.label;
+    lbl.style.color      = lvl.color;
+});
+
+/* ── Password match check ───────────────────────────────────────── */
+document.getElementById('confirm_password').addEventListener('input', function () {
+    const newPwd = document.getElementById('new_password').value;
+    const msg    = document.getElementById('password-match-msg');
+    msg.style.display = 'block';
+    if (this.value === newPwd) {
+        msg.textContent  = '✓ Les mots de passe correspondent';
+        msg.style.color  = 'var(--success)';
+    } else {
+        msg.textContent  = '✗ Les mots de passe ne correspondent pas';
+        msg.style.color  = 'var(--error)';
+    }
+});
+</script>
+
+{% include 'footer.html' %}

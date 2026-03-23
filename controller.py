@@ -2,13 +2,27 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from model import DB
 from functools import wraps
 import json
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = b'c1dcc1cc06d7cb4e0fd4a03b45a4f33135b9346736edf2f2'
 app.template_folder = 'view'
 
+# Avatar upload config
+UPLOAD_FOLDER = os.path.join('static', 'avatars')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5 MB
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 # ─── Helpers ─────────────────────────────────────────────────────────
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def convert_json_to_string(json_file):
     with open(json_file, 'r', encoding='utf-8') as file:
@@ -112,7 +126,6 @@ def logout():
 @login_required
 def list_events():
     events = DB.list_events()
-    # Attach participation count to each event
     for event in events:
         event['current_count'] = DB.count_participations_by_event(event['id'])
     return render_template('eventPage.html', events=events)
@@ -234,6 +247,91 @@ def delete_event(event_id):
         flash("Événement supprimé", "success")
     else:
         flash("Vous n'êtes pas autorisé à supprimer cet événement", "error")
+    return redirect(url_for('show_profile', user_id=session['id']))
+
+
+# ─── Profile Edit Routes ─────────────────────────────────────────────
+
+@app.get('/profile/edit')
+@login_required
+def edit_profile():
+    user = DB.get_user_by_id(session['id'])
+    if not user:
+        flash("Utilisateur introuvable", "error")
+        return redirect(url_for('home'))
+    return render_template('editProfilePage.html', user=user)
+
+
+@app.post('/profile/edit/bio')
+@login_required
+def edit_bio():
+    bio = request.form.get('bio', '').strip()
+    DB.update_bio(session['id'], bio)
+    flash("Bio mise à jour avec succès !", "success")
+    return redirect(url_for('show_profile', user_id=session['id']))
+
+
+@app.post('/profile/edit/password')
+@login_required
+def edit_password():
+    current_password = request.form.get('current_password', '')
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    if not all([current_password, new_password, confirm_password]):
+        flash("Veuillez remplir tous les champs", "error")
+        return redirect(url_for('edit_profile'))
+
+    if not DB.verify_password(session['id'], current_password):
+        flash("Mot de passe actuel incorrect", "error")
+        return redirect(url_for('edit_profile'))
+
+    if new_password != confirm_password:
+        flash("Les nouveaux mots de passe ne correspondent pas", "error")
+        return redirect(url_for('edit_profile'))
+
+    if len(new_password) < 6:
+        flash("Le mot de passe doit contenir au moins 6 caractères", "error")
+        return redirect(url_for('edit_profile'))
+
+    DB.update_password(session['id'], new_password)
+    flash("Mot de passe modifié avec succès !", "success")
+    return redirect(url_for('show_profile', user_id=session['id']))
+
+
+@app.post('/profile/edit/avatar')
+@login_required
+def edit_avatar():
+    if 'avatar' not in request.files:
+        flash("Aucun fichier sélectionné", "error")
+        return redirect(url_for('edit_profile'))
+
+    file = request.files['avatar']
+
+    if file.filename == '':
+        flash("Aucun fichier sélectionné", "error")
+        return redirect(url_for('edit_profile'))
+
+    if not allowed_file(file.filename):
+        flash("Format non supporté. Utilisez PNG, JPG, JPEG, GIF ou WEBP", "error")
+        return redirect(url_for('edit_profile'))
+
+    # Check file size
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size > MAX_AVATAR_SIZE:
+        flash("L'image est trop lourde (max 5 Mo)", "error")
+        return redirect(url_for('edit_profile'))
+
+    # Save file with unique name
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    filename = f"avatar_{session['id']}.{ext}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+
+    DB.update_avatar(session['id'], filename)
+    flash("Photo de profil mise à jour !", "success")
     return redirect(url_for('show_profile', user_id=session['id']))
 
 

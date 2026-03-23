@@ -58,9 +58,17 @@ class DB:
                 age INTEGER NOT NULL,
                 gender TEXT NOT NULL,
                 bio TEXT NOT NULL DEFAULT '',
+                avatar TEXT DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         ''')
+
+        # Add avatar column if it doesn't exist (for existing databases)
+        try:
+            db_run('ALTER TABLE Users ADD COLUMN avatar TEXT DEFAULT NULL')
+        except Exception:
+            pass  # Column already exists
+
         db_run('''
             CREATE TABLE IF NOT EXISTS Activities (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -141,6 +149,26 @@ class DB:
     def count_users():
         result = db_fetch('SELECT COUNT(*) as cnt FROM Users')
         return result['cnt'] if result else 0
+
+    @staticmethod
+    def update_bio(user_id, bio):
+        return db_update('UPDATE Users SET bio = ? WHERE id = ?', (bio, user_id))
+
+    @staticmethod
+    def update_password(user_id, new_password):
+        password_hash = generate_password_hash(new_password)
+        return db_update('UPDATE Users SET password_hash = ? WHERE id = ?', (password_hash, user_id))
+
+    @staticmethod
+    def verify_password(user_id, password):
+        user = db_fetch('SELECT password_hash FROM Users WHERE id = ?', (user_id,))
+        if user:
+            return check_password_hash(user['password_hash'], password)
+        return False
+
+    @staticmethod
+    def update_avatar(user_id, avatar_filename):
+        return db_update('UPDATE Users SET avatar = ? WHERE id = ?', (avatar_filename, user_id))
 
     # ── Activities ────────────────────────────────────────────────
 
