@@ -1,22 +1,105 @@
-{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kalos — La plateforme des sportifs. Trouvez des partenaires et événements sportifs près de chez vous.">
+    <title>Kalos — Réseau Social Sportif</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='extras.css') }}">
+</head>
+<body>
 
-<div class="page-404">
-    <div class="page-404-content">
-        <div class="page-404-number">404</div>
-        <h1 class="page-404-title">Page introuvable</h1>
-        <p class="page-404-text">
-            Oups ! La page que vous cherchez n'existe pas ou a été déplacée.<br>
-            Retournez à l'accueil pour continuer.
-        </p>
-        <div class="page-404-actions">
-            <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-home"></i> Retour à l'accueil
-            </a>
-            <a href="{{ url_for('list_events') }}" class="btn btn-secondary btn-lg">
-                <i class="fas fa-search"></i> Voir les événements
-            </a>
+<!-- ─── Header ────────────────────────────────────────────────────── -->
+<header class="header" id="main-header">
+    <a href="{{ url_for('home') }}" class="header-logo">
+        <img src="{{ url_for('static', filename='Fichier1.svg') }}" alt="Kalos">
+        <span>Kalos</span>
+    </a>
+
+    <button class="mobile-toggle" id="mobile-toggle" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <nav class="header-nav" id="header-nav">
+        <a href="{{ url_for('home') }}" class="nav-link">Accueil</a>
+        <a href="{{ url_for('list_events') }}" class="nav-link">Événements</a>
+
+        <!-- Dark / Light toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Changer le thème" title="Mode clair / sombre">
+            <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+
+        {% if 'id' in session %}
+        <div class="header-user">
+            <div class="user-dropdown">
+                <button class="user-avatar-btn" id="user-avatar-btn">
+                    {{ session['firstName'][0] | upper }}
+                </button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <a href="{{ url_for('show_profile', user_id=session['id']) }}" class="dropdown-item">
+                        <i class="fas fa-user"></i> Mon profil
+                    </a>
+                    <a href="{{ url_for('create_event_page') }}" class="dropdown-item">
+                        <i class="fas fa-plus"></i> Créer un événement
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <form action="{{ url_for('logout') }}" method="post" style="margin:0;">
+                        <button type="submit" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+        {% else %}
+        <div class="auth-buttons">
+            <a href="{{ url_for('login') }}" class="btn btn-secondary btn-sm">Connexion</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-primary btn-sm">Inscription</a>
+        </div>
+        {% endif %}
+    </nav>
+</header>
 
-{% include 'footer.html' %}
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-messages" id="flash-messages">
+    {% for category, message in messages %}
+    <div class="flash-msg {{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<script>
+/* ── Theme Manager ─────────────────────────────────────────────── */
+(function() {
+    const saved = localStorage.getItem('kalos-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+
+    function updateIcon(theme) {
+        const icon = document.getElementById('theme-icon');
+        if (!icon) return;
+        icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+
+    updateIcon(saved);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('theme-toggle');
+        if (!btn) return;
+        let current = document.documentElement.getAttribute('data-theme') || 'dark';
+        updateIcon(current);
+
+        btn.addEventListener('click', function() {
+            current = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', current);
+            localStorage.setItem('kalos-theme', current);
+            updateIcon(current);
+        });
+    });
+})();
+</script>

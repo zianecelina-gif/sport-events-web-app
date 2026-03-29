@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════
-   KALOS-main.js - Main JavaScript for Kalos website
+   KALOS -Main JavaScript 
+   Animations · Counters · 3D Cards · Scroll-to-top · Loader
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Page Loader ─────────────────────────────────────────────────── */

@@ -3,7 +3,7 @@
 <!-- ─── DataTables CSS ─────────────────────────────────────────────── -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 
-<!-- ─── DataTable + Search Custom Styles ──────────────────────────── -->
+<!-- ─── DataTable Custom Styles ──────────────────────────────────── -->
 <style>
     /* ── Wrapper ────────────────────────────────────────────────── */
     .datatable-section {
@@ -85,10 +85,19 @@
         transition: color var(--transition-fast);
     }
 
-    table.dataTable thead th.sorting:hover { color: var(--accent-light); }
-    table.dataTable thead th.sorting_asc  { color: var(--accent-light); }
-    table.dataTable thead th.sorting_desc { color: var(--accent-light); }
+    table.dataTable thead th.sorting:hover {
+        color: var(--accent-light);
+    }
 
+    table.dataTable thead th.sorting_asc {
+        color: var(--accent-light);
+    }
+
+    table.dataTable thead th.sorting_desc {
+        color: var(--accent-light);
+    }
+
+    /* Custom sort arrows */
     table.dataTable thead th.sorting::after,
     table.dataTable thead th.sorting_asc::after,
     table.dataTable thead th.sorting_desc::after {
@@ -101,7 +110,9 @@
         transition: background var(--transition-fast);
     }
 
-    table.dataTable tbody tr:last-child { border-bottom: none; }
+    table.dataTable tbody tr:last-child {
+        border-bottom: none;
+    }
 
     table.dataTable tbody tr:hover {
         background: var(--bg-glass-hover) !important;
@@ -116,7 +127,7 @@
         vertical-align: middle;
     }
 
-    /* ── Bottom bar ─────────────────────────────────────────────── */
+    /* ── Bottom bar (info + pagination) ─────────────────────────── */
     div.dataTables_wrapper div.dataTables_info {
         padding: 16px 24px;
         color: var(--text-muted);
@@ -163,7 +174,7 @@
         opacity: 0.5;
     }
 
-    /* ── Badges ─────────────────────────────────────────────────── */
+    /* ── Badge: activité ────────────────────────────────────────── */
     .dt-activity-badge {
         display: inline-flex;
         align-items: center;
@@ -178,6 +189,7 @@
         letter-spacing: 0.02em;
     }
 
+    /* ── Badge: places ──────────────────────────────────────────── */
     .dt-headcount-badge {
         display: inline-flex;
         align-items: center;
@@ -186,17 +198,26 @@
         font-size: 0.85rem;
     }
 
-    .dt-headcount-badge.full      { color: var(--error); }
-    .dt-headcount-badge.available { color: var(--success); }
+    .dt-headcount-badge.full {
+        color: var(--error);
+    }
 
+    .dt-headcount-badge.available {
+        color: var(--success);
+    }
+
+    /* ── Event name link ────────────────────────────────────────── */
     .dt-event-name {
         font-weight: 600;
         color: var(--text-primary);
         transition: color var(--transition-fast);
     }
 
-    .dt-event-name:hover { color: var(--accent-light); }
+    .dt-event-name:hover {
+        color: var(--accent-light);
+    }
 
+    /* ── Location cell ──────────────────────────────────────────── */
     .dt-location {
         color: var(--text-secondary);
         font-size: 0.85rem;
@@ -206,12 +227,14 @@
         white-space: nowrap;
     }
 
+    /* ── Date cell ──────────────────────────────────────────────── */
     .dt-date {
         color: var(--text-secondary);
         font-size: 0.85rem;
         white-space: nowrap;
     }
 
+    /* ── No data ────────────────────────────────────────────────── */
     table.dataTable tbody td.dataTables_empty {
         text-align: center;
         color: var(--text-muted);
@@ -260,127 +283,6 @@
         flex-wrap: wrap;
         gap: 12px;
         margin-bottom: 24px;
-    }
-
-    /* ══════════════════════════════════════════════════════════════
-       LIVE SEARCH BAR
-       ══════════════════════════════════════════════════════════════ */
-    .live-search-wrapper {
-        position: relative;
-        margin-bottom: 24px;
-    }
-
-    .live-search-input {
-        width: 100%;
-        padding: 14px 20px 14px 48px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.95rem;
-        color: var(--text-primary);
-        background: var(--bg-glass);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        outline: none;
-        transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-        backdrop-filter: blur(12px);
-    }
-
-    .live-search-input:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px var(--accent-glow);
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .live-search-input::placeholder {
-        color: var(--text-muted);
-    }
-
-    .live-search-icon {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        pointer-events: none;
-        transition: color var(--transition-fast);
-    }
-
-    .live-search-wrapper:focus-within .live-search-icon {
-        color: var(--accent);
-    }
-
-    .live-search-clear {
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        font-size: 0.85rem;
-        padding: 4px;
-        border-radius: 50%;
-        display: none;
-        transition: color var(--transition-fast);
-    }
-
-    .live-search-clear:hover {
-        color: var(--text-primary);
-    }
-
-    .live-search-clear.visible {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Results count badge */
-    .search-results-count {
-        display: none;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.82rem;
-        color: var(--text-muted);
-        margin-top: -16px;
-        margin-bottom: 16px;
-        padding-left: 4px;
-    }
-
-    .search-results-count.visible {
-        display: flex;
-    }
-
-    .search-results-count strong {
-        color: var(--accent-light);
-    }
-
-    /* No results state for cards */
-    .no-results-card {
-        display: none;
-        text-align: center;
-        padding: 60px 20px;
-        grid-column: 1 / -1;
-    }
-
-    .no-results-card i {
-        font-size: 2.5rem;
-        color: var(--text-muted);
-        margin-bottom: 16px;
-    }
-
-    .no-results-card p {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-    }
-
-    .no-results-card strong {
-        color: var(--text-secondary);
-    }
-
-    /* Hidden card */
-    .event-card.search-hidden {
-        display: none !important;
     }
 </style>
 
@@ -455,35 +357,10 @@
 
         {% if events %}
 
-            <!-- ── LIVE SEARCH BAR ──────────────────────────────── -->
-            <div class="live-search-wrapper">
-                <i class="fas fa-search live-search-icon"></i>
-                <input
-                    type="text"
-                    id="live-search"
-                    class="live-search-input"
-                    placeholder="Rechercher par nom, activité ou lieu…"
-                    autocomplete="off"
-                >
-                <button class="live-search-clear" id="live-search-clear" title="Effacer">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Results count -->
-            <div class="search-results-count" id="search-results-count">
-                <i class="fas fa-info-circle"></i>
-                <span id="search-results-text"></span>
-            </div>
-
             <!-- ── CARD VIEW (default) ──────────────────────────── -->
             <div id="view-cards" class="events-grid">
                 {% for event in events %}
-                <a href="{{ url_for('event_details', event_id=event.id) }}"
-                   class="event-card glass-card"
-                   data-search-name="{{ event.name | lower }}"
-                   data-search-activity="{{ event.activity | lower }}"
-                   data-search-location="{{ event.location | lower }}">
+                <a href="{{ url_for('event_details', event_id=event.id) }}" class="event-card glass-card">
                     <div class="event-card-image">
                         <img src="{{ url_for('static', filename='activities/' + event.activity + '.jpg') }}" alt="{{ event.activity }}">
                         <span class="event-activity-badge">{{ event.activity }}</span>
@@ -506,12 +383,6 @@
                     </div>
                 </a>
                 {% endfor %}
-
-                <!-- No results placeholder (cards view) -->
-                <div class="no-results-card" id="no-results-cards">
-                    <i class="fas fa-search"></i>
-                    <p>Aucun événement ne correspond à <strong id="no-results-query"></strong></p>
-                </div>
             </div>
 
             <!-- ── TABLE VIEW (DataTable) ───────────────────────── -->
@@ -534,25 +405,36 @@
                                 data-href="{{ url_for('event_details', event_id=event.id) }}"
                                 data-date="{{ event.date }}"
                             >
-                                <td><span class="dt-event-name">{{ event.name }}</span></td>
+                                <!-- Nom -->
+                                <td>
+                                    <span class="dt-event-name">{{ event.name }}</span>
+                                </td>
+
+                                <!-- Activité -->
                                 <td>
                                     <span class="dt-activity-badge">
                                         <i class="fas fa-running"></i>
                                         {{ event.activity }}
                                     </span>
                                 </td>
+
+                                <!-- Date (affichage DD/MM/YYYY, tri sur YYYY-MM-DD via data-order) -->
                                 <td data-order="{{ event.date }}">
                                     <span class="dt-date">
                                         <i class="far fa-calendar-alt" style="color: var(--accent); margin-right: 6px;"></i>
                                         {{ event.date[8:10] }}/{{ event.date[5:7] }}/{{ event.date[0:4] }}
                                     </span>
                                 </td>
+
+                                <!-- Lieu -->
                                 <td>
                                     <span class="dt-location" title="{{ event.location }}">
                                         <i class="fas fa-map-marker-alt" style="color: var(--accent); margin-right: 6px;"></i>
                                         {{ event.location }}
                                     </span>
                                 </td>
+
+                                <!-- Places -->
                                 <td data-order="{{ event.current_count }}">
                                     <span class="dt-headcount-badge {{ 'full' if is_full else 'available' }}">
                                         <i class="fas fa-users"></i>
@@ -588,25 +470,26 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   KALOS — Events Page JS
+   KALOS — Events DataTable
    ═══════════════════════════════════════════════════════════════════ */
 
 let dataTable = null;
 
 /* ── Initialize DataTable ───────────────────────────────────────── */
 function initDataTable() {
-    if (dataTable) return;
+    if (dataTable) return; // Already initialized
 
     dataTable = $('#events-datatable').DataTable({
+        // ── Language (French) ──────────────────────────────────────
         language: {
-            search:            '<i class="fas fa-search" style="margin-right:8px; color:var(--accent);"></i>Rechercher :',
+            search:          '<i class="fas fa-search" style="margin-right:8px; color:var(--accent);"></i>Rechercher :',
             searchPlaceholder: 'Nom, activité, lieu…',
-            lengthMenu:        'Afficher _MENU_ événements',
-            info:              '_START_ à _END_ sur _TOTAL_ événements',
-            infoEmpty:         'Aucun événement disponible',
-            infoFiltered:      '(filtré depuis _MAX_ événements)',
-            zeroRecords:       'Aucun événement ne correspond à votre recherche.',
-            emptyTable:        'Aucun événement disponible.',
+            lengthMenu:      'Afficher _MENU_ événements',
+            info:            '_START_ à _END_ sur _TOTAL_ événements',
+            infoEmpty:       'Aucun événement disponible',
+            infoFiltered:    '(filtré depuis _MAX_ événements)',
+            zeroRecords:     'Aucun événement ne correspond à votre recherche.',
+            emptyTable:      'Aucun événement disponible.',
             paginate: {
                 first:    '<i class="fas fa-angle-double-left"></i>',
                 last:     '<i class="fas fa-angle-double-right"></i>',
@@ -614,22 +497,30 @@ function initDataTable() {
                 previous: '<i class="fas fa-angle-left"></i>'
             }
         },
-        pageLength:  10,
-        lengthMenu:  [5, 10, 25, 50],
-        order:       [[2, 'asc']],
-        responsive:  true,
-        autoWidth:   false,
+
+        // ── Options ────────────────────────────────────────────────
+        pageLength:    10,
+        lengthMenu:    [5, 10, 25, 50],
+        order:         [[2, 'asc']], // Sort by date ASC by default
+        responsive:    true,
+        autoWidth:     false,
+
+        // ── Column definitions ─────────────────────────────────────
         columnDefs: [
-            { targets: 0, width: '28%' },
-            { targets: 1, width: '16%' },
-            { targets: 2, width: '14%' },
-            { targets: 3, width: '30%' },
-            { targets: 4, width: '12%', searchable: false }
+            { targets: 0, width: '28%' },  // Nom
+            { targets: 1, width: '16%' },  // Activité
+            { targets: 2, width: '14%' },  // Date
+            { targets: 3, width: '30%' },  // Lieu
+            { targets: 4, width: '12%', searchable: false }  // Places
         ],
+
+        // ── DOM layout ─────────────────────────────────────────────
         dom:
             '<"d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 pt-4"lf>' +
             't' +
             '<"d-flex justify-content-between align-items-center flex-wrap px-4 pb-2"ip>',
+
+        // ── Row click → navigate to event detail ──────────────────
         createdRow: function(row) {
             $(row).on('click', function() {
                 const href = $(this).data('href');
@@ -637,12 +528,6 @@ function initDataTable() {
             });
         }
     });
-
-    // Sync live search input with DataTable search
-    const liveInput = document.getElementById('live-search');
-    if (liveInput && liveInput.value.trim()) {
-        dataTable.search(liveInput.value.trim()).draw();
-    }
 }
 
 /* ── View switcher ──────────────────────────────────────────────── */
@@ -659,12 +544,7 @@ function switchView(view) {
         tableEl.style.display = 'block';
         btnCards.classList.remove('active');
         btnTable.classList.add('active');
-        initDataTable();
-
-        // Sync current search term to DataTable
-        const query = document.getElementById('live-search')?.value.trim() || '';
-        if (dataTable && query) dataTable.search(query).draw();
-
+        initDataTable(); // Lazy init on first open
     } else {
         tableEl.style.display = 'none';
         cardsEl.style.display = 'grid';
@@ -672,104 +552,6 @@ function switchView(view) {
         btnTable.classList.remove('active');
     }
 }
-
-/* ══════════════════════════════════════════════════════════════════
-   LIVE SEARCH
-   ══════════════════════════════════════════════════════════════════ */
-(function () {
-    const input       = document.getElementById('live-search');
-    const clearBtn    = document.getElementById('live-search-clear');
-    const countEl     = document.getElementById('search-results-count');
-    const countText   = document.getElementById('search-results-text');
-    const noResultsEl = document.getElementById('no-results-cards');
-    const noResultsQ  = document.getElementById('no-results-query');
-
-    if (!input) return;
-
-    const allCards = document.querySelectorAll('.event-card[data-search-name]');
-    const total    = allCards.length;
-
-    function updateCount(visible, query) {
-        if (!query) {
-            countEl.classList.remove('visible');
-            return;
-        }
-        countEl.classList.add('visible');
-        if (visible === 0) {
-            countText.innerHTML = `Aucun résultat pour <strong>"${query}"</strong>`;
-        } else if (visible === total) {
-            countText.innerHTML = `<strong>${visible}</strong> événement${visible > 1 ? 's' : ''} affiché${visible > 1 ? 's' : ''}`;
-        } else {
-            countText.innerHTML = `<strong>${visible}</strong> résultat${visible > 1 ? 's' : ''} sur ${total} pour <strong>"${query}"</strong>`;
-        }
-    }
-
-    function filterCards(query) {
-        const q = query.trim().toLowerCase();
-
-        // Show/hide clear button
-        if (q) {
-            clearBtn.classList.add('visible');
-        } else {
-            clearBtn.classList.remove('visible');
-        }
-
-        let visibleCount = 0;
-
-        allCards.forEach(card => {
-            const name     = card.dataset.searchName     || '';
-            const activity = card.dataset.searchActivity || '';
-            const location = card.dataset.searchLocation || '';
-            const matches  = !q || name.includes(q) || activity.includes(q) || location.includes(q);
-
-            if (matches) {
-                card.classList.remove('search-hidden');
-                visibleCount++;
-            } else {
-                card.classList.add('search-hidden');
-            }
-        });
-
-        // No results placeholder
-        if (noResultsEl) {
-            if (visibleCount === 0 && q) {
-                noResultsEl.style.display = 'block';
-                if (noResultsQ) noResultsQ.textContent = `"${query.trim()}"`;
-            } else {
-                noResultsEl.style.display = 'none';
-            }
-        }
-
-        updateCount(visibleCount, query.trim());
-
-        // Also filter DataTable if active
-        if (dataTable) {
-            dataTable.search(q).draw();
-        }
-    }
-
-    // Input event — debounced for performance
-    let debounceTimer;
-    input.addEventListener('input', function () {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => filterCards(this.value), 120);
-    });
-
-    // Clear button
-    clearBtn.addEventListener('click', function () {
-        input.value = '';
-        filterCards('');
-        input.focus();
-    });
-
-    // Keyboard shortcut: Escape clears search
-    input.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            input.value = '';
-            filterCards('');
-        }
-    });
-})();
 </script>
 
 {% include 'footer.html' %}
